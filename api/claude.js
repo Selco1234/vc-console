@@ -11,7 +11,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-5",
-        max_tokens: 1200,
+        max_tokens: 8000,
         system,
         messages: [{ role: "user", content: user }],
       }),
