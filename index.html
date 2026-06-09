@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SELCO · Value Chain Research Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Spline+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--green:#173d2a;--green-2:#0f2c1e;--cream:#f4f0e4;--cream-2:#ece6d4;--orange:#d97a34;--orange-soft:#e8a86a;--ink:#23271f;--muted:#6b6f63;--amber:#c9942a;--red:#b23a2e;--line:#d8d2c0;--good:#3f7a52;--card:#fbf9f1}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:'Spline Sans',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .app{display:flex;min-height:100vh}
+  h1,h2,h3,.serif{font-family:'Fraunces',serif}
+  .eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);font-weight:600}
+  a{color:var(--green)}
+  .side{width:248px;flex-shrink:0;background:var(--green);color:var(--cream);padding:22px 16px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .brand{font-family:'Fraunces',serif;font-weight:900;font-size:20px;line-height:1.1}
+  .brand small{display:block;font-family:'Spline Sans';font-weight:400;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange-soft);margin-top:5px}
+  .navsec{margin-top:18px}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13.5px;transition:.15s;color:rgba(244,240,228,.82)}
+  .nav-item:hover{background:rgba(255,255,255,.07)}
+  .nav-item.active{background:var(--orange);color:#fff;font-weight:500}
+  .nav-item .n{font-family:'Fraunces',serif;font-size:12px;opacity:.7;width:18px;flex-shrink:0}
+  .nav-item .dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:transparent}
+  .nav-item .dot.has{background:var(--orange-soft)} .nav-item.active .dot.has{background:#fff}
+  .side .util{margin-top:18px;border-top:1px solid rgba(255,255,255,.13);padding-top:14px}
+  .main{flex:1;min-width:0;padding:30px 36px 90px;max-width:1000px}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:20px}
+  .proj{font-size:12.5px;color:var(--muted)} .proj b{color:var(--green)}
+  .meters{display:flex;gap:12px}
+  .meter{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 13px;min-width:96px}
+  .meter .num{font-family:'Fraunces',serif;font-size:23px;font-weight:900;line-height:1}
+  .meter .lab{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+  .meter.debt .num{color:var(--red)} .meter.rigor .num{color:var(--good)}
+  h1.sectitle{font-size:33px;font-weight:900;color:var(--green);line-height:1.04;margin:2px 0 4px}
+  .secsub{color:var(--muted);font-size:14px;margin-bottom:14px}
+  .whatis{background:var(--cream-2);border-left:3px solid var(--green);border-radius:0 9px 9px 0;padding:13px 17px;margin-bottom:18px;font-size:13.5px;line-height:1.55}
+  .whatis .wl{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--green);font-weight:600;display:block;margin-bottom:5px}
+  .whatis b{color:var(--green)}
+  .btn{font-family:'Spline Sans';font-weight:600;font-size:13px;border:none;border-radius:8px;padding:10px 16px;cursor:pointer;transition:.15s}
+  .btn-primary{background:var(--orange);color:#fff} .btn-primary:hover{background:#c56a28}
+  .btn-ghost{background:transparent;color:var(--green);border:1px solid var(--green)} .btn-ghost:hover{background:var(--green);color:var(--cream)}
+  .btn-sm{padding:7px 12px;font-size:12px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+
+  /* guide */
+  .guide{background:var(--green);color:var(--cream);border-radius:13px;margin-bottom:18px;overflow:hidden}
+  .guide .gh{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;cursor:pointer}
+  .guide .gh .t{font-family:'Fraunces',serif;font-size:17px}
+  .guide .gh .chev{transition:transform .25s;font-size:12px;opacity:.8}
+  .guide.open .chev{transform:rotate(180deg)}
+  .guide .gb{max-height:0;overflow:hidden;transition:max-height .4s}
+  .guide.open .gb{max-height:1400px}
+  .guide .gi{padding:0 18px 18px}
+  .step{display:flex;gap:11px;margin-bottom:13px}
+  .step .num{font-family:'Fraunces',serif;font-weight:900;font-size:15px;color:var(--orange-soft);flex-shrink:0;width:20px}
+  .step .body{font-size:13px}
+  .step .body b{color:#fff}
+  .toolchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .tchip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:7px;padding:5px 9px;font-size:11.5px}
+  .tchip b{color:var(--orange-soft)}
+  .promptbox{background:var(--green-2);border:1px solid rgba(255,255,255,.14);border-radius:9px;padding:12px 14px;margin-top:8px}
+  .promptbox pre{white-space:pre-wrap;font-family:'Spline Sans';font-size:12px;color:rgba(244,240,228,.9);line-height:1.45}
+  .promptbox .pact{margin-top:9px}
+  .hardrule{margin-top:12px;background:rgba(178,58,46,.22);border:1px solid var(--red);border-radius:8px;padding:9px 13px;font-size:12px}
+  .hardrule b{color:#f3b4ab}
+
+  /* paste */
+  .pastecard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .pastecard h3{font-size:17px;color:var(--green);margin-bottom:3px}
+  .pastecard .hint{font-size:12.5px;color:var(--muted);margin-bottom:13px}
+  textarea,input,select{width:100%;font-family:'Spline Sans';font-size:13.5px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  textarea{resize:vertical;min-height:110px}
+  textarea:focus,input:focus{outline:none;border-color:var(--orange)}
+
+  /* findings */
+  .ledger{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .lhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+  .lhead h3{font-size:17px;color:var(--green)}
+  .filterbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .fchip{background:transparent;border:1px solid var(--line);border-radius:20px;padding:5px 11px;cursor:pointer;font-size:11.5px;color:var(--muted)}
+  .fchip.active{background:var(--green);color:var(--cream);border-color:var(--green)}
+  .finding{border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:10px;background:#fff}
+  .finding.unsourced{border-left:4px solid var(--red)} .finding.invalid{border-left:4px solid var(--red)}
+  .finding.unverified{border-left:4px solid var(--amber)} .finding.dated{border-left:4px solid var(--amber)} .finding.unsure{border-left:4px solid var(--amber)}
+  .finding.valid{border-left:4px solid var(--good)}
+  .finding .claim{font-size:14px;margin-bottom:6px}
+  .finding .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+  .gtag{font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:var(--cream-2);color:var(--muted);border-radius:20px;padding:2px 9px}
+  .status{font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;font-weight:600;border-radius:20px;padding:3px 10px}
+  .status.unsourced,.status.invalid{background:#f6dcd7;color:var(--red)}
+  .status.unverified{background:#fdf0d8;color:var(--amber)} .status.dated{background:#fdf0d8;color:var(--amber)} .status.unsure{background:#fdf0d8;color:var(--amber)}
+  .status.valid{background:#e0efe4;color:var(--good)} .status.checking{background:var(--cream-2);color:var(--muted)}
+  .finding .srcline{font-size:11.5px;color:var(--muted);margin-bottom:9px}
+  .finding .srcline.warn{color:var(--red)}
+  .finding .acts{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+  .finding .acts .btn{font-size:11.5px;padding:6px 11px}
+  .finding .del{margin-left:auto;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer}
+  .vnote{margin-top:9px;font-size:12px;background:var(--cream-2);border-radius:8px;padding:9px 12px;line-height:1.5}
+  .vnote.live{background:var(--green-2);color:var(--cream)}
+  .addsrc{display:flex;gap:7px;margin-top:9px}
+  .addsrc input{flex:1;font-size:12.5px;padding:7px 10px}
+  .cqline{margin-top:9px;font-size:12.5px;background:var(--green-2);color:var(--cream);border-radius:8px;padding:10px 13px;white-space:pre-wrap;line-height:1.5}
+  .empty{color:var(--muted);font-size:13px;font-style:italic;padding:8px 0}
+  .spin{display:inline-block;width:11px;height:11px;border:2px solid var(--orange);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-1px;margin-right:5px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .basket{background:var(--green);color:var(--cream);border-radius:12px;padding:18px;margin-bottom:16px}
+  .basket h3{font-family:'Fraunces',serif;font-size:17px;margin-bottom:3px}
+  .basket .sub{font-size:12px;color:rgba(244,240,228,.68);margin-bottom:12px}
+  .fitem{font-size:13px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1)} .fitem:last-child{border:none}
+  .fitem span{color:var(--orange-soft);font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-right:7px}
+
+  .handover{background:linear-gradient(135deg,var(--green),var(--green-2));color:var(--cream);border-radius:13px;padding:22px;margin-bottom:16px}
+  .handover h3{font-family:'Fraunces',serif;font-size:20px;margin-bottom:13px}
+  .scorebar{display:flex;height:30px;border-radius:8px;overflow:hidden;margin-bottom:9px;background:rgba(255,255,255,.1)}
+  .scorebar div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;transition:width .4s}
+  .sb-p{background:var(--good)} .sb-c{background:var(--amber);color:#1a1405} .sb-a{background:var(--red)}
+  .scorelegend{font-size:12px;color:rgba(244,240,228,.8)}
+  .verdict{margin-top:13px;font-family:'Fraunces',serif;font-size:15px;padding:12px 15px;border-radius:8px;background:rgba(255,255,255,.08)}
+
+  .savebar{position:fixed;bottom:0;left:248px;right:0;background:var(--card);border-top:1px solid var(--line);padding:11px 36px;display:flex;justify-content:space-between;align-items:center;gap:14px;z-index:50}
+  .savebar .status2{font-size:12px;color:var(--muted)} .savebar .status2 b{color:var(--good)}
+  .dashgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .dashcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s}
+  .dashcard:hover{border-color:var(--orange);transform:translateY(-2px)}
+  .dashcard h4{font-family:'Fraunces',serif;font-size:17px;color:var(--green);margin-bottom:2px}
+  .dashcard .meta{font-size:11.5px;color:var(--muted);margin-bottom:11px}
+  .minibar{display:flex;height:10px;border-radius:6px;overflow:hidden;background:var(--cream-2);margin-bottom:7px}
+  .dashcard .stat{font-size:11.5px;color:var(--muted)}
+  .banner{background:var(--orange);color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13.5px;font-weight:500}
+  .modal-bg{position:fixed;inset:0;background:rgba(15,30,20,.55);display:flex;align-items:flex-start;justify-content:center;padding:60px 20px;z-index:100;overflow-y:auto}
+  .modal{background:var(--cream);border-radius:14px;padding:26px;max-width:560px;width:100%}
+  .modal h2{font-size:24px;color:var(--green);margin-bottom:4px}
+  .modal p{font-size:13.5px;color:var(--muted);margin-bottom:16px}
+  .modal label{display:block;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 5px}
+  .modal input{margin-bottom:12px}
+  @media(max-width:820px){.side{display:none}.savebar{left:0}.main{padding:22px 18px 90px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="side">
+    <div class="brand">Value Chain<br>Research Console<small>SELCO Foundation</small></div>
+    <div class="navsec" id="navSections"></div>
+    <div class="util">
+      <div class="nav-item" onclick="newProject()"><span class="n">＋</span> New project</div>
+      <div class="nav-item" onclick="go('dashboard')"><span class="n">▥</span> Reviewer dashboard</div>
+      <div class="nav-item" onclick="go('share')"><span class="n">⤴</span> Publish &amp; share</div>
+    </div>
+  </nav>
+  <main class="main" id="main"></main>
+</div>
+<div class="savebar" id="saveBar" style="display:none">
+  <div class="status2" id="saveStatus">Not saved yet</div>
+  <div class="btnrow"><button class="btn btn-ghost btn-sm" onclick="renameProject()">Edit project info</button>
+  <button class="btn btn-primary btn-sm" onclick="saveProject(true)">Save now</button></div>
+</div>
+<div class="modal-bg" id="setupModal">
+  <div class="modal">
+    <div class="eyebrow">New research project</div>
+    <h2 class="serif">Name this value chain</h2>
+    <p>One project = one value chain in one geography. This is what shows on the reviewer dashboard, and it personalises the research prompts the tool gives you.</p>
+    <label>Value chain / commodity</label><input id="su-vc" placeholder="e.g. Jackfruit">
+    <label>District(s) &amp; state</label><input id="su-geo" placeholder="e.g. Koraput, Odisha">
+    <label>Your team / researcher name</label><input id="su-team" placeholder="e.g. East India Livelihoods Team">
+    <button class="btn btn-primary" style="margin-top:6px" onclick="createProject()">Start research →</button>
+    <p style="margin-top:14px;font-size:11.5px" id="su-resume"></p>
+  </div>
+</div>
+
+<script>
+/* ---------------- SECTION SCHEMA ---------------- */
+const SECTIONS=[
+ {id:'s1',num:'01',title:'Context Setting',sub:'Space · Sector · Segment',
+  groups:[{k:'space',name:'Space'},{k:'sector',name:'Sector'},{k:'segment',name:'Segment'}],
+  probes:['Production volumes at national / state / district level and the region\'s share','% of villages in target districts with reliable grid access','Months cut off by floods, roads or harvest pressure; distance to nearest market','Tribal / SC / ST household share and women\'s roles in the chain','Households engaged at district / state level; primary or supplementary livelihood'],
+  sources:'Census & PLFS (households, occupation); State Horticulture/AH Dept; NHB & Commodity Boards (production); FAOSTAT; CEEW (climate exposure).'},
+ {id:'s2',num:'02',title:'The Commodity',sub:'Lifecycle · varieties · every output',
+  groups:[{k:'var',name:'Varieties & Breeds'},{k:'life',name:'Lifecycle'},{k:'out',name:'Outputs & By-products'},{k:'gap',name:'Productivity Gap'}],
+  probes:['Indigenous varieties/breeds, who maintains them, what they value beyond yield','Promoted/commercial varieties and who actually benefits','Full production lifecycle with time durations and labour by gender','State/ICAR Package of Practices (cite document + year)','Every output, by-product and value-addition route; what is wasted at each node','Small-producer yield vs national average and the root causes of the gap'],
+  sources:'State Horticulture/AH/Sericulture Dept (PoP); ICAR commodity institute; KVK; NHB; FAOSTAT; APEDA (export grades).'},
+ {id:'s3',num:'03',title:'Value Chain Map',sub:'Every node · practice vs PoP · where it breaks',
+  groups:[{k:'input',name:'Input Supply'},{k:'prod',name:'Production'},{k:'harv',name:'Harvest'},{k:'post',name:'Post-Harvest'},{k:'proc',name:'Processing'},{k:'store',name:'Storage'},{k:'mkt',name:'Market'},{k:'byp',name:'By-product'}],
+  probes:['What small farmers actually do at each node vs the PoP recommendation','% lost between harvest and market and at which node most loss occurs','Farmgate-to-retail price ratio and who captures value at each node','What machinery exists per node and whether it is sized for small farmers','Where the chain serves large actors well but fails small producers'],
+  sources:'State PoP docs; ICAR bulletins; Ministry of Food Processing (post-harvest loss); NABARD (value-chain finance, FPO reports); APEDA (prices).',
+  insight:'Why does the chain fail small producers? Capture 4–6 systemic reasons as declarative statements.'},
+ {id:'s4',num:'04',title:'End Users',sub:'Typology · vulnerability · income',
+  groups:[{k:'typ',name:'Typology'},{k:'vuln',name:'Gender & Vulnerability'},{k:'inc',name:'Livelihood & Income'}],
+  probes:['Distinct user types (producer, processor, collector, labourer) and their scale/market access','Which one or two typologies SELCO is designing for and why','Where women provide labour vs control income; asset ownership by gender','Persons with disability / tribal communities and how their system differs','Income in a good vs bad year, and realistic ceiling if gaps are fixed'],
+  sources:'Census (social-category households); NSSO/PLFS (income); State dept reports; NGO baselines; SELCO past studies.'},
+ {id:'s5',num:'05',title:'Existing Solutions',sub:'Global · India · what not to reinvent',
+  groups:[{k:'glob',name:'Global Learning'},{k:'india',name:'India / NGO'},{k:'tech',name:'Technology'},{k:'biz',name:'Business & Finance'}],
+  probes:['Countries that solved key challenges and the enabling conditions','NGOs/enterprises/programmes that intervened — what worked, what failed','Machinery per node, who makes it, cost, scale, DRE compatibility','Business/finance models: custom hiring, shared equipment, pay-per-use','Classify each solution: proven for small farmers / pilot candidate / innovation gap'],
+  sources:'FAO, IFAD, World Bank (value-chain reports); CIFOR, Bioversity (varieties); ICAR annual reports; Google Scholar.',
+  insight:'Classify every solution: proven & ready / pilot candidate / genuine innovation gap. This feeds Section 09 — evidence, not optimism.'},
+ {id:'s6',num:'06',title:'Stakeholders',sub:'Who holds the chain · schemes to unlock',
+  groups:[{k:'actors',name:'Actors & Roles'},{k:'schemes',name:'Schemes'},{k:'partners',name:'Partners & Field Targets'}],
+  probes:['Who actually sets price and on what basis','FPOs/cooperatives — actual function vs registered purpose','Each relevant scheme: nodal ministry, what it funds, eligibility, uptake rate','Specific barrier to scheme uptake (not generic awareness)','Real organisations the team must meet and what to learn from each'],
+  sources:'IDR & The Wire (NGO landscape); MyScheme, PRS India, IndiaCode (schemes & budgets); SFAC, NABARD (FPO data); State mission sites.'},
+ {id:'s7',num:'07',title:'Climate Lens',sub:'Hazards · stress · adaptation · DRE',
+  groups:[{k:'haz',name:'Hazards'},{k:'stress',name:'Commodity Stress'},{k:'dre',name:'Adaptation & DRE'}],
+  probes:['Documented hazard trends and which districts face highest exposure','How yield, quality or animal health is affected by observed change','New pests/diseases linked to temperature or humidity shifts','What farmers are already doing to adapt, uninstructed','Where a solar/DRE solution is a direct response to a climate problem'],
+  sources:'CEEW (district climate-risk); IMD (rainfall/temp history); State Climate Action Plans; IPCC WG-II; ICAR climate-smart briefs.'},
+ {id:'s8',num:'08',title:'Primary Research Plan',sub:'Built from everything flagged in 01–07',special:'fieldplan',
+  groups:[{k:'sites',name:'Learning Sites'},{k:'guide',name:'Interview Guide'}],
+  probes:['Which NGOs/KVKs/model farms/FPOs to visit and why each','The single most important thing to learn at each site','Questions on day-to-day practice, pain points, and solution validation'],
+  sources:'Golden rule: never ask a farmer what a report could tell you. Target the auto-listed gaps below.'},
+ {id:'s9',num:'09',title:'Intervention Pathways',sub:'Node-specific · user-specific',
+  groups:[{k:'adapt',name:'Adapt & Deploy'},{k:'pilot',name:'Pilot & Prove'},{k:'innov',name:'Innovate'},{k:'eco',name:'Ecosystem Support'}],
+  probes:['Proven solutions to contextualise and the adaptation needed','Solutions to pilot — hypothesis and success criteria','Genuine innovation gaps — problem statement and who must be involved','Non-tech: market linkage, scheme convergence, FPO strengthening'],
+  sources:'Synthesis of Sections 03, 05, 06 and 08. Every pathway links to a node, a typology and a reason SELCO is the right actor.'},
+ {id:'s10',num:'10',title:'Implementation Priorities',sub:'Low-hanging · medium · longer timeline',
+  groups:[{k:'t1',name:'Tier 1'},{k:'t2',name:'Tier 2'},{k:'t3',name:'Tier 3'}],
+  probes:['Tier 1: benchmarked solution proven for this user, willing partner, evident demand','Tier 2: hypothesis, pilot design, success criteria, go/no-go timeline','Tier 3: formal problem statement and what has been tried before'],
+  sources:'Sequencing of Section 09. Be honest: Tier 1 ready to move, Tier 3 needs development.'}
+];
+const STATUS_LABEL={valid:'Verified',invalid:'Doesn’t hold up',dated:'Pre-2022',unverified:'Source unchecked',unsure:'Spot-check the figure',unsourced:'No source',checking:'Checking…'};
+const WHAT={
+ s1:"Before anything else, establish the ground you're working on: the <b>Space</b> (the place — terrain, connectivity, energy access), the <b>Sector</b> (the economy — production volumes, schemes, the region's share) and the <b>Segment</b> (the people — who actually works in this chain and how excluded they are).",
+ s2:"This is the 'what' and 'why' of the product itself — its varieties and breeds, its full production lifecycle, and every possible output and by-product — established before you map how it travels through the chain.",
+ s3:"Map the commodity's journey node by node, from input supply to market. At each node, compare what small farmers actually do against the official Package of Practices, and pinpoint where the chain breaks down for small producers.",
+ s4:"Segment the people in the chain into distinct user types (producer, processor, collector, labourer) by role, resources and market access — so you can name exactly which group SELCO is designing for, and who is most left behind.",
+ s5:"Find what has already been solved — globally and in India — so SELCO builds on it instead of reinventing it. Classify each solution as proven, a pilot candidate, or a genuine gap where real innovation is still needed.",
+ s6:"Map everyone who holds power in this chain — government, NGOs, FPOs, traders, financiers — and the schemes that could fund an intervention. These actors are also your key informants for the field visits in Section 08.",
+ s7:"Apply a climate lens to the place, the commodity and the producer separately: what hazards are documented, how they stress the commodity, what farmers are already doing to adapt, and where solar/DRE is a direct response to a climate problem.",
+ s8:"Built after Sections 01–07, once you know what's missing. A gap-driven field plan whose golden rule is: never ask a farmer something a report could have told you. The unsourced findings from earlier sections are auto-listed below as your validation targets.",
+ s9:"Written after both secondary and primary research. Concrete things SELCO should do — each tied to a specific node, a specific user type, and a clear reason SELCO is the right actor. Always points toward solutions, not just problems.",
+ s10:"Sequence the interventions honestly by how ready they are: Tier 1 can move now, Tier 2 needs a pilot, Tier 3 needs longer development. This is the handover to the Scale team."
+};
+const TIPS={
+ s1:["Get district-level numbers, not just national — a state average hides the village reality you're designing for.","Separate what schemes <b>promote</b> from what families <b>actually</b> do; they are often different.","Name the specific tribal/SC/ST communities and women's roles, not 'marginalised groups' in general."],
+ s2:["List indigenous varieties first and what communities value beyond yield — taste, hardiness, market premium.","Cite the exact Package of Practices document and its year; an undated PoP is not a source.","Map by-products and waste at every stage — the overlooked output is often the real opportunity."],
+ s3:["Cover every node, including upstream ones; don't skip to processing because the ideas are richer there.","For each node: what farmers actually do, the gap versus the PoP, then the root cause.","Loss percentages and price spreads must be cited from a study, not estimated."],
+ s4:["Keep user types distinct — a forest collector and a trained apiculturist are different design briefs, not one 'small farmer'.","Separate where women provide labour from where they control income; the gap is the point.","Give a good-year and bad-year income figure; ranges reveal vulnerability better than averages."],
+ s5:["For every external solution, end with a verdict: directly applicable, needs adaptation, or not relevant here.","Look for documented failures too — what didn't work is as useful as what did.","Note whether each solution was built for small farmers or merely adapted to reach them."],
+ s6:["Name real organisations and offices, not generic actor types — these become your field interviews.","For each scheme, find the actual uptake rate and the specific reason it is low, not 'lack of awareness'.","Flag convergence: two or three schemes that together could fund what neither covers alone."],
+ s7:["Use district-level climate data (CEEW, IMD), not India-level generalisations.","Capture what farmers are already doing to adapt on their own — the most credible signal.","Mark where solar/DRE answers a climate problem, not just an efficiency gain."],
+ s8:["Don't ask a farmer what a report could tell you — use field time to validate, correct and discover.","Each learning site should contribute one clear insight; record it, don't just list the visit.","Be honest about what you still don't know after fieldwork."],
+ s9:["Tie every pathway to a specific node, a specific user type, and a reason SELCO is the right actor.","Classify honestly: adapt (proven), pilot (unproven here), or innovate (no solution exists).","Say clearly what SELCO should not do, and why."],
+ s10:["Sequence by readiness, not ambition: Tier 1 can move now, Tier 3 needs development.","For pilots, state the hypothesis and the go/no-go criteria up front.","Write Tier 3 problem statements formally — they are the handover to the Scale team."]
+};
+
+/* ---------------- STORAGE ---------------- */
+let MEM={};
+const Store={ok:true,
+ _ls(){try{return window.localStorage}catch(e){return null}},
+ async save(id,v){const ls=this._ls();if(ls){try{ls.setItem('vcproj:'+id,JSON.stringify(v));let x=JSON.parse(ls.getItem('vcproj:index')||'[]');if(x.indexOf(id)<0){x.push(id);ls.setItem('vcproj:index',JSON.stringify(x));}return true}catch(e){}}MEM[id]=v;return true;},
+ async load(id){const ls=this._ls();if(ls){try{const r=ls.getItem('vcproj:'+id);if(r)return JSON.parse(r)}catch(e){}}return MEM[id]||null;},
+ async list(){const ls=this._ls();if(ls){try{return JSON.parse(ls.getItem('vcproj:index')||'[]').map(id=>'vcproj:'+id)}catch(e){}}return Object.keys(MEM).map(id=>'vcproj:'+id);}};
+
+/* ---------------- AI ---------------- */
+const AI_ENDPOINT="/api/claude";
+async function callClaude(system,user,useWeb){
+  const res=await fetch(AI_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({system,user,useWeb:!!useWeb})});
+  const data=await res.json();
+  return (data.text||'').trim();
+}
+
+/* ---------------- STATE ---------------- */
+let P=null,view='s1',filter='all',readonly=false;
+function blank(vc,geo,team){const o={id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),vc,geo,team,created:Date.now(),updated:Date.now(),f:{}};SECTIONS.forEach(s=>o.f[s.id]=[]);return o;}
+
+/* ---------------- BOOT ---------------- */
+window.addEventListener('DOMContentLoaded',init);
+async function init(){
+  buildNav();
+  const m=(location.hash||'').match(/view=(.+)$/);
+  if(m){try{const snap=JSON.parse(decodeURIComponent(escape(atob(m[1]))));if(snap&&snap.f){P=snap;readonly=true;document.getElementById('setupModal').style.display='none';document.getElementById('saveBar').style.display='none';go('s1');return;}}catch(e){}}
+  const keys=await Store.list(),su=document.getElementById('su-resume');
+  if(keys.length){
+    let best=null;
+    for(const k of keys){const p=await Store.load(k.replace('vcproj:',''));if(p&&(!best||(p.updated||0)>(best.updated||0)))best=p;}
+    if(best){P=best;document.getElementById('setupModal').style.display='none';document.getElementById('saveBar').style.display='flex';go('s1');markSaved();return;}
+  }
+  if(!Store.ok){su.textContent='Note: saving across visits and across people needs the hosted version. Here your work is kept for this session and via the Publish link.';}
+}
+async function resume(id){const p=await Store.load(id);if(p){P=p;document.getElementById('setupModal').style.display='none';document.getElementById('saveBar').style.display='flex';go('s1');markSaved();}}
+function createProject(){P=blank(v('su-vc')||'Untitled chain',v('su-geo')||'—',v('su-team')||'—');document.getElementById('setupModal').style.display='none';document.getElementById('saveBar').style.display='flex';go('s1');saveProject();}
+function renameProject(){const vc=prompt('Value chain',P.vc);if(vc===null)return;P.vc=vc;P.geo=prompt('District(s) & state',P.geo)||P.geo;P.team=prompt('Team / researcher',P.team)||P.team;render();saveProject();}
+function v(id){return document.getElementById(id).value.trim();}
+function newProject(){['su-vc','su-geo','su-team'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});readonly=false;document.getElementById('su-resume').textContent='';document.getElementById('setupModal').style.display='flex';}
+
+/* ---------------- NAV ---------------- */
+function buildNav(){document.getElementById('navSections').innerHTML=SECTIONS.map(s=>`<div class="nav-item" data-id="${s.id}" onclick="go('${s.id}')"><span class="n">${s.num}</span><span>${s.title}</span><span class="dot" id="dot-${s.id}"></span></div>`).join('');}
+function go(x){view=x;filter='all';render();}
+
+/* ---------------- DERIVED ---------------- */
+function F(sid){return (P&&P.f[sid])||[];}
+function allF(){let a=[];SECTIONS.forEach(s=>F(s.id).forEach(x=>a.push({...x,sid:s.id})));return a;}
+function tally(list){const t=list.length,good=list.filter(x=>x.status==='valid').length,mid=list.filter(x=>x.status==='unverified'||x.status==='dated'||x.status==='unsure').length,bad=list.filter(x=>x.status==='unsourced'||x.status==='invalid').length;return{t,good,mid,bad,rigor:t?Math.round(good/t*100):0};}
+
+/* ---------------- RENDER ---------------- */
+function render(){
+  if(!P)return;
+  document.querySelectorAll('.nav-item[data-id]').forEach(n=>n.classList.toggle('active',n.dataset.id===view));
+  SECTIONS.forEach(s=>{const d=document.getElementById('dot-'+s.id);if(d)d.className='dot'+(F(s.id).length?' has':'');});
+  const m=document.getElementById('main');
+  if(view==='dashboard')return renderDashboard(m);
+  if(view==='share')return renderShare(m);
+  renderSection(m,SECTIONS.find(s=>s.id===view));
+}
+function topbar(){const a=tally(allF());return `<div class="topbar"><div><div class="eyebrow">${readonly?'Published snapshot':'Value Chain Research'}</div><div class="proj"><b>${esc(P.vc)}</b> · ${esc(P.geo)} · ${esc(P.team)}</div></div><div class="meters"><div class="meter rigor"><div class="num">${a.rigor}%</div><div class="lab">Verified (all)</div></div><div class="meter debt"><div class="num">${a.bad}</div><div class="lab">No / failed source</div></div></div></div>`;}
+
+function renderSection(m,S){
+  const list=F(S.id),t=tally(list);
+  let html=topbar();
+  html+=`<h1 class="sectitle">${S.title}</h1><div class="secsub">Section ${S.num} of 10 · ${S.sub}</div>`;
+  html+=`<div class="whatis"><span class="wl">What this section is</span>${WHAT[S.id]||''}</div>`;
+  if(readonly){const b='<div class="banner">📋 You are viewing a <b>published snapshot</b> ('+esc(P.vc)+'). Read-only.</div>';html=b+html;}
+
+  /* GUIDE */
+  if(!readonly){
+    const prompt=researchPrompt(S);
+    html+=`<div class="guide ${list.length?'':'open'}" id="guide"><div class="gh" onclick="document.getElementById('guide').classList.toggle('open')"><div class="t">📖 How to research ${S.title} — start here</div><div class="chev">▼</div></div><div class="gb"><div class="gi">
+      <div class="step"><div class="num">1</div><div class="body"><b>Pick the right tool for the job.</b>
+        <div class="toolchips">
+          <div class="tchip"><b>Google Scholar</b> — peer-reviewed studies & theses</div>
+          <div class="tchip"><b>Perplexity / web-search AI</b> — to locate stats (then click through to the real page)</div>
+          <div class="tchip"><b>NotebookLM</b> — upload the PoP PDF or reports you hold; ask it to extract & cite</div>
+          <div class="tchip"><b>For this section</b> — ${esc(S.sources)}</div>
+        </div></div></div>
+      <div class="step"><div class="num">2</div><div class="body"><b>Use this prompt</b> (already filled for ${esc(P.vc)} in ${esc(P.geo)}). Copy it into Perplexity or your AI of choice, then click through to verify every source it gives.
+        <div class="promptbox"><pre id="promptText">${esc(prompt)}</pre><div class="pact"><button class="btn btn-primary btn-sm" onclick="copyPrompt()" id="cpBtn">⧉ Copy prompt</button></div></div></div></div>
+      <div class="step"><div class="num">3</div><div class="body"><b>Paste what you find below.</b> The console breaks it into findings, checks each source against the live web, and pushes anything unsourced or that fails the check into your field plan.</div></div>
+      <div class="step"><div class="num">★</div><div class="body"><b>What good research looks like here:</b><div style="margin-top:6px">${(TIPS[S.id]||[]).map(t=>`<div style="padding:3px 0 3px 15px;position:relative;font-size:12.5px"><span style="position:absolute;left:0;color:var(--orange-soft)">›</span>${t}</div>`).join('')}</div></div></div>
+      <div class="hardrule"><b>The hard rule:</b> no number enters the deck on a chatbot's say-so. Every figure needs a credible source, 2022+ where possible. No source ⇒ it becomes a field-validation target, not a finding.</div>
+    </div></div></div>`;
+  }
+
+  /* FIELD PLAN (s8) */
+  if(S.special==='fieldplan'){
+    const flagged=allF().filter(x=>!['s8','s9','s10'].includes(x.sid)&&(x.status==='unsourced'||x.status==='invalid'));
+    html+=`<div class="basket"><h3>↳ Auto-compiled field-validation targets</h3><div class="sub">Every finding left unsourced or that failed source-check across Sections 01–07 lands here. This is your field plan, built for you.</div>${flagged.length?flagged.map(x=>`<div class="fitem"><span>${secNum(x.sid)} · ${grpName(x.sid,x.group)}</span>${esc(x.claim)}</div>`).join(''):'<div style="font-size:13px;color:rgba(244,240,228,.6);font-style:italic">Nothing flagged yet — unsourced findings from earlier sections appear here automatically.</div>'}</div>`;
+  }
+
+  /* PASTE */
+  if(!readonly){
+    html+=`<div class="pastecard"><h3>Paste your findings</h3><div class="hint">Paste as much as you like for ${S.title} — a few lines or a few pages of notes, in any format. There's no strict limit; if you've gathered a lot, paste it all and the console will split it into separate findings. Put any source names or links right next to the facts — the console pulls them out.</div>
+      <textarea id="pasteBox" oninput="dumpCount()" placeholder="e.g.  Koraput grows ~18,000 t mango/yr (NHB Area & Production 2023, nhb.gov.in).  About 30% of villages have reliable grid (CEEW 2022).  Most women do harvesting but don't control income — heard anecdotally, no source yet..."></textarea>
+      <div id="dumpMeta" style="font-size:11.5px;color:var(--muted);margin-top:6px">0 words · paste up to a few pages comfortably</div>
+      <div class="btnrow" style="margin-top:9px"><button class="btn btn-primary" id="analyseBtn" onclick="analyse('${S.id}')">⚙ Analyse my findings</button>
+      ${list.filter(x=>x.status==='unverified').length?`<button class="btn btn-ghost" onclick="verifyAll('${S.id}')">🌐 Verify all unchecked sources</button>`:''}</div>
+      <div id="analyseMsg" style="font-size:12px;color:var(--muted);margin-top:9px"></div></div>`;
+  }
+
+  /* FINDINGS */
+  html+=`<div class="ledger"><div class="lhead"><h3>Findings · ${S.title}</h3>${!readonly&&list.length?`<button class="btn btn-ghost btn-sm" onclick="auditSection('${S.id}')">⚖ Audit this section</button>`:''}</div>`;
+  if(list.length){
+    html+=`<div class="filterbar">`+['all','unsourced','unverified','valid'].map(f=>`<div class="fchip ${filter===f?'active':''}" onclick="setFilter('${f}')">${f==='all'?'All ('+list.length+')':f.charAt(0).toUpperCase()+f.slice(1)+' ('+list.filter(x=>x.status===f||(f==='unverified'&&(x.status==='unverified'||x.status==='dated'||x.status==='unsure'))||(f==='unsourced'&&(x.status==='unsourced'||x.status==='invalid'))).length+')'}</div>`).join('')+`</div>`;
+  }
+  const shown=list.filter(x=>filter==='all'||x.status===filter||(filter==='unverified'&&(x.status==='dated'||x.status==='unsure'))||(filter==='unsourced'&&x.status==='invalid'));
+  if(!list.length) html+=`<div class="empty">No findings yet — paste your research above and hit Analyse.</div>`;
+  else if(!shown.length) html+=`<div class="empty">None in this filter.</div>`;
+  else html+=shown.map(x=>findingHTML(S.id,list.indexOf(x),x)).join('');
+  html+=`<div id="auditBox"></div></div>`;
+
+  html+=scorecard(S.id,t,S.insight);
+  m.innerHTML=html;
+}
+
+function findingHTML(sid,i,x){
+  const srcWarn=(x.status==='unsourced'||x.status==='invalid');
+  return `<div class="finding ${x.status}" id="f-${sid}-${i}">
+    <div class="claim">${esc(x.claim)}</div>
+    <div class="meta"><span class="gtag">${grpName(sid,x.group)}</span><span class="status ${x.status}" id="st-${sid}-${i}">${STATUS_LABEL[x.status]}</span></div>
+    <div class="srcline ${srcWarn?'warn':''}">${x.source?('Source: '+esc(x.source)+(x.year?(' · '+x.year+(parseInt(x.year)<2022?' ⚠ pre-2022':'')):'')):'⚠ No source — this cannot enter the deck until sourced or validated in the field.'}</div>
+    ${x.vnote?`<div class="vnote ${x.vchecked?'live':''}">${(x.vchecked&&!x.manual)?'🌐 ':''}${esc(x.vnote)}</div>`:''}
+    ${(!readonly&&(x.status==='invalid'||x.status==='unsure'||x.status==='dated'))?`<div style="font-size:11.5px;color:var(--muted);margin-top:5px">The note above is the reason. Don't agree? You can <b>Re-check</b>, paste the exact line from your source to check it directly, or confirm it yourself.</div>`:''}
+    ${x.cq?`<div class="cqline">${esc(x.cq)}</div>`:''}
+    ${readonly?'':`<div class="acts">
+      ${x.source
+        ?`<button class="btn btn-ghost" onclick="verify('${sid}',${i})">🌐 ${x.vchecked?'Re-check':'Verify source'}</button>
+          <button class="btn btn-ghost" onclick="toggleVT('${sid}',${i})">📄 Check against source text</button>
+          <button class="btn btn-ghost" onclick="manualVerify('${sid}',${i})">✓ Confirm myself</button>`
+        :`<button class="btn btn-ghost" onclick="findSource('${sid}',${i})">🌐 Find a credible source</button>`}
+      <button class="btn btn-ghost" onclick="crossQ('${sid}',${i})">⟳ Cross-question</button>
+      <button class="del" title="remove" onclick="del('${sid}',${i})">×</button>
+    </div>
+    ${x.source
+      ?`<div class="addsrc" id="vtrow-${sid}-${i}" style="display:none"><input id="vt-${sid}-${i}" placeholder="Paste the exact line(s) from your source that back this claim…"><button class="btn btn-primary btn-sm" onclick="verifyAgainstText('${sid}',${i})">Check text</button></div>`
+      :`<div class="addsrc"><input id="as-${sid}-${i}" placeholder="…or paste a source name / link yourself, then verify"><button class="btn btn-primary btn-sm" onclick="addSource('${sid}',${i})">Add &amp; verify</button></div>`}`}
+  </div>`;
+}
+
+function researchPrompt(S){
+  return `I'm doing secondary research for a SELCO Foundation livelihoods program on ${P.vc} in ${P.geo}.\nSection: ${S.title}. Find CREDIBLE sources, 2022 or newer where possible, for each of the following:\n${S.probes.map(p=>'- '+p).join('\n')}\nFor EVERY fact, give me: the exact source name, the year, and a link or document title I can verify myself. If you cannot find a credible source for something, say so explicitly — do NOT invent a statistic.`;
+}
+function copyPrompt(){const t=document.getElementById('promptText').innerText,b=document.getElementById('cpBtn');const done=()=>{b.textContent='✓ Copied';setTimeout(()=>b.textContent='⧉ Copy prompt',1600);};if(navigator.clipboard){navigator.clipboard.writeText(t).then(done).catch(done);}else done();}
+
+function scorecard(sid,t,insight){
+  if(!t.t) return `<div class="handover"><h3>Handover scorecard</h3><div class="scorelegend">Add findings to generate the scorecard.</div></div>`;
+  const pG=t.good/t.t*100,pM=t.mid/t.t*100,pB=t.bad/t.t*100;
+  let v;
+  if(pB>40)v='⚠ Not field-ready. Too many findings have no source or a failed source. Source them, or carry them honestly into the field plan.';
+  else if(pG>=60)v='✓ Strong. Most findings are verified against a credible source. A reviewer can sign off on the secondary phase.';
+  else v='◐ Mixed. Acceptable to proceed, but verify the unchecked sources where they drive a decision.';
+  return `<div class="handover"><h3>Handover scorecard — ${SECTIONS.find(s=>s.id===sid).title}</h3>
+    <div class="scorebar"><div class="sb-p" style="width:${pG}%">${pG>10?Math.round(pG)+'%':''}</div><div class="sb-c" style="width:${pM}%">${pM>10?Math.round(pM)+'%':''}</div><div class="sb-a" style="width:${pB}%">${pB>10?Math.round(pB)+'%':''}</div></div>
+    <div class="scorelegend"><b style="color:#9fd3ad">${t.good} verified</b> · <b style="color:#f0c878">${t.mid} unchecked</b> · <b style="color:#f0a89f">${t.bad} no/failed source</b> · ${t.t} findings</div>
+    <div class="verdict">${v}</div>${insight?`<div class="verdict" style="background:rgba(217,122,52,.18)"><b style="color:var(--orange-soft)">Key insight slide:</b> ${esc(insight)}</div>`:''}</div>`;
+}
+
+/* ---------------- INTERACTIONS ---------------- */
+function setFilter(f){filter=f;render();}
+function del(sid,i){P.f[sid].splice(i,1);render();saveProject();}
+
+async function analyse(sid){
+  const S=SECTIONS.find(s=>s.id===sid),box=document.getElementById('pasteBox'),txt=box.value.trim(),msg=document.getElementById('analyseMsg'),btn=document.getElementById('analyseBtn');
+  if(!txt){msg.textContent='Paste your findings first.';return;}
+  btn.disabled=true;msg.innerHTML='<span class="spin"></span>Breaking your notes into findings…';
+  const groups=S.groups.map(g=>`${g.k}=${g.name}`).join(', ');
+  const sys=`You parse a researcher's raw secondary-research notes for SELCO Foundation (small & marginal farmers, rural India), section "${S.title}". Break the notes into DISTINCT factual findings. For each finding return: "claim" (one clear factual statement), "source" (any source name/citation/URL mentioned for it, else null), "year" (4-digit year if stated or in the citation, else null), "group" (the best-fit key from: ${groups}). Return ONLY a JSON array, no prose, no code fences. If a sentence has no factual content, skip it.`;
+  try{
+    let out=await callClaude(sys,txt,false);
+    out=out.replace(/```json|```/g,'').trim();
+    const arr=JSON.parse(out);
+    let added=0;
+    arr.forEach(o=>{ if(!o.claim)return; const grp=(S.groups.find(g=>g.k===o.group)||S.groups[0]).k;
+      P.f[sid].push({claim:o.claim,source:o.source||null,year:o.year?(''+o.year):null,group:grp,status:o.source?'unverified':'unsourced',vnote:'',cq:''}); added++; });
+    box.value='';
+    const noSrc=P.f[sid].filter(x=>x.status==='unsourced').length;
+    msg.textContent=added?`Added ${added} finding${added>1?'s':''}.`+(noSrc?` ${noSrc} have no citation yet — hit “Find a credible source” on each, or paste a link, then verify.`:` Now verify the sources, or cross-question anything that looks thin.`):'No clear findings detected — try writing them as plain statements.';
+    render();saveProject();
+  }catch(e){msg.innerHTML='Could not parse that. The live analysis needs the active runtime (or your server relay when hosted). '+esc(e.message);btn.disabled=false;}
+}
+
+async function verify(sid,i){
+  const x=P.f[sid][i];if(!x.source)return;
+  const st=document.getElementById('st-'+sid+'-'+i);if(st){st.textContent=STATUS_LABEL.checking;st.className='status checking';}
+  const S=SECTIONS.find(s=>s.id===sid);
+  const sys=`You verify research sources for SELCO Foundation by SEARCHING THE WEB. Given a CLAIM and the SOURCE cited for it, judge by searching: (a) does the source exist and is it credible — a government body, established institution, peer-reviewed journal, or recognised NGO? (b) is it 2022 or later? (c) is the claim supported — either stated in the source itself OR clearly corroborated by other credible evidence you find on the web?
+Your FIRST line MUST be exactly one of: "VERDICT: valid", "VERDICT: dated", "VERDICT: invalid", "VERDICT: unsure". Then a newline and 1-2 sentences naming what you actually found.
+Definitions:
+• valid — credible source, 2022 or later, and the claim is found in it OR clearly corroborated by credible evidence. If you cannot read the exact figure inside a paywalled/full-text source but it is credible and the figure is consistent with reputable data, still mark VALID and tell the user to spot-check the exact number.
+• dated — credible and supported, but the source is pre-2022.
+• invalid — ONLY if the cited source is clearly not a real or credible source, OR credible evidence you find directly CONTRADICTS the claim. If you simply cannot locate or read the source, that is "unsure", never "invalid".
+• unsure — the source is credible but you found no corroboration for the claim anywhere.
+Do NOT over-hedge: a credible peer-reviewed or government source plus consistent evidence is VALID. Do not invent figures.`;
+  const usr=`CLAIM: "${x.claim}"\nSOURCE CITED: ${x.source}\nYEAR GIVEN: ${x.year||'(none)'}\nSection: ${S.title}. Search the web and verify.`;
+  try{
+    const out=await callClaude(sys,usr,true);
+    const m=out.match(/VERDICT:\s*(valid|invalid|dated|unsure)/i);
+    const verdict=m?m[1].toLowerCase():inferVerdict(out);
+    const note=(out.replace(/^[\s\S]*?VERDICT:\s*\w+/i,'').trim())||out.trim();
+    x.status= verdict==='valid'?'valid': verdict==='dated'?'dated': verdict==='invalid'?'invalid':'unsure';
+    x.vnote=note||'No detail returned.';x.vchecked=true;
+    render();saveProject();
+  }catch(e){ x.vnote='Could not run web verification here — needs the active runtime / server relay. '+e.message; x.vchecked=true; render(); }
+}
+function inferVerdict(t){t=(t||'').toLowerCase();
+  if(/does not exist|doesn't exist|not found|could not find the source|not credible|contradict|fabricat|no such (article|report|page)/.test(t))return'invalid';
+  if(/pre-2022|before 2022|published in 201|dated 201| from 201/.test(t))return'dated';
+  if(/no corroboration|could not (corroborate|confirm)|unable to (corroborate|confirm|verify)|insufficient evidence/.test(t))return'unsure';
+  if(/exists|credible|peer-reviewed|consistent with|corroborat|supports|confirms|legitimate|\bvalid\b/.test(t))return'valid';
+  return'unsure';}
+async function verifyAll(sid){ const idxs=P.f[sid].map((x,i)=>x.status==='unverified'?i:-1).filter(i=>i>=0); for(const i of idxs){ await verify(sid,i); } }
+
+function dumpCount(){const b=document.getElementById('pasteBox'),m=document.getElementById('dumpMeta');if(!b||!m)return;const w=b.value.trim()?b.value.trim().split(/\s+/).length:0,c=b.value.length;let note=' · paste up to a few pages comfortably';if(c>12000)note=' · that\'s a lot — analysis may take a few seconds, or split it across two pastes';else if(c>200)note=' · ready to analyse';m.textContent=`${w} words${note}`;}
+
+function toggleVT(sid,i){const r=document.getElementById('vtrow-'+sid+'-'+i);if(r)r.style.display=(r.style.display==='none'||!r.style.display)?'flex':'none';}
+function manualVerify(sid,i){if(!confirm('Mark this finding as verified on your own check? It will count as verified and be noted as researcher-confirmed (not web-verified).'))return;const x=P.f[sid][i];x.status='valid';x.vchecked=true;x.manual=true;x.vnote='✓ Confirmed by the researcher — checked manually, not by web search.';render();saveProject();}
+async function verifyAgainstText(sid,i){
+  const x=P.f[sid][i],inp=document.getElementById('vt-'+sid+'-'+i),txt=inp?inp.value.trim():'';
+  if(!txt){alert('Paste the line(s) from your source first.');return;}
+  const st=document.getElementById('st-'+sid+'-'+i);if(st){st.textContent=STATUS_LABEL.checking;st.className='status checking';}
+  x.vnote='Checking your claim against the pasted source text…';render();
+  const sys=`You check whether a SOURCE EXCERPT (text the researcher copied from their own source) supports a CLAIM. Line 1 MUST be exactly "VERDICT: valid", "VERDICT: unsure" or "VERDICT: invalid". Then one sentence. valid = the excerpt clearly supports the claim. invalid = the excerpt contradicts the claim. unsure = the excerpt is related but does not clearly confirm the specific claim. Judge ONLY from the excerpt provided; do not use outside knowledge.`;
+  const usr=`CLAIM: "${x.claim}"\nSOURCE EXCERPT: """${txt}"""\nDoes the excerpt support the claim?`;
+  try{
+    const out=await callClaude(sys,usr,false);
+    const m=out.match(/VERDICT:\s*(valid|invalid|unsure)/i);
+    const verdict=m?m[1].toLowerCase():inferVerdict(out);
+    const note=(out.replace(/^[\s\S]*?VERDICT:\s*\w+/i,'').trim())||out.trim();
+    x.status= verdict==='valid'?'valid': verdict==='invalid'?'invalid':'unsure';
+    x.vnote='Checked against your pasted source — '+note; x.vchecked=true; x.manual=true;
+    render();saveProject();
+  }catch(e){ x.vnote='Could not run this check — needs the active runtime / server relay. '+e.message; render(); }
+}
+
+async function findSource(sid,i){
+  const x=P.f[sid][i],S=SECTIONS.find(s=>s.id===sid);
+  const st=document.getElementById('st-'+sid+'-'+i);if(st){st.textContent=STATUS_LABEL.checking;st.className='status checking';}
+  x.vnote='🌐 Searching the web for a credible source…';render();
+  const sys=`You find credible sources for SELCO Foundation research by SEARCHING THE WEB. Given a CLAIM with no citation, search for a credible, 2022-or-later source (government body, established institution, peer-reviewed journal, or recognised NGO) that supports it for the Indian/regional context.
+Line 1 MUST be exactly one of: "VERDICT: valid", "VERDICT: dated", "VERDICT: invalid", "VERDICT: unsure".
+Line 2 MUST start "SOURCE: " then the exact source name and its URL if you found one (or "SOURCE: none").
+Then one sentence on what it says.
+valid = found a credible 2022+ source supporting the claim. dated = found a credible source but pre-2022. invalid = the claim appears false or contradicted. unsure = no credible source found. Never invent a source or URL — if you didn't find one, say "SOURCE: none".`;
+  const usr=`CLAIM NEEDING A SOURCE: "${x.claim}"\nSection: ${S.title}; geography: ${P.geo}. Search the web for a credible source.`;
+  try{
+    const out=await callClaude(sys,usr,true);
+    const vm=out.match(/VERDICT:\s*(valid|invalid|dated|unsure)/i);
+    const verdict=vm?vm[1].toLowerCase():inferVerdict(out);
+    const sm=out.match(/SOURCE:\s*(.+)/i);
+    const found=sm?sm[1].trim():'';
+    const note=(out.replace(/^[\s\S]*?SOURCE:\s*.+/i,'').trim())||(out.replace(/VERDICT:\s*\w+/i,'').trim());
+    if(found && !/^none/i.test(found) && verdict!=='invalid' && verdict!=='unsure'){
+      x.source=found; const ym=found.match(/(20\d\d)/); if(ym)x.year=ym[1];
+      x.status= verdict==='dated'?'dated':'valid'; x.vnote='Found a source: '+(note||'see source above.'); x.vchecked=true;
+    } else {
+      x.status= verdict==='invalid'?'invalid':'unsourced';
+      x.vnote=(note||'No credible source found on the web — this needs a manual source or field validation.'); x.vchecked=true;
+    }
+    render();saveProject();
+  }catch(e){ x.vnote='Source search needs the active runtime / server relay. '+e.message; x.vchecked=true; render(); }
+}
+
+function addSource(sid,i){const inp=document.getElementById('as-'+sid+'-'+i),val=inp.value.trim();if(!val)return;const x=P.f[sid][i];x.source=val;const ym=val.match(/(20\d\d)/);if(ym)x.year=ym[1];x.status='unverified';render();saveProject();setTimeout(()=>verify(sid,i),50);}
+
+async function crossQ(sid,i){
+  const x=P.f[sid][i],S=SECTIONS.find(s=>s.id===sid);
+  x.cq='⟳ Cross-questioning…';render();
+  const sys=`You are the cross-questioning engine in SELCO Foundation's Value Chain Research Console (small & marginal farmers, rural India), section "${S.title}". Act as a sharp, fair research supervisor. Push back on this finding using SELCO's standards: national/state figures where a DISTRICT figure is needed; weak or missing source; pre-2022 data where newer exists; vague quantities needing a number; conflating what schemes promote with what farmers actually do; whether it's findable in a report vs only answerable in the field. Output 2-3 short pointed questions, each starting "→ ". No preamble or praise. Under 80 words.`;
+  const usr=`FINDING: "${x.claim}"\nSOURCE: ${x.source||'none'}\nYEAR: ${x.year||'none'}\nCross-question this.`;
+  try{ x.cq=await callClaude(sys,usr,false); }catch(e){ x.cq='Cross-questioning needs the active runtime / server relay. '+e.message; }
+  render();
+}
+
+async function auditSection(sid){
+  const S=SECTIONS.find(s=>s.id===sid),list=F(sid),t=tally(list);
+  const dump=list.map((x,i)=>`${i+1}. "${x.claim}" [${x.source||'NO SOURCE'}; ${x.year||'no year'}; status: ${STATUS_LABEL[x.status]}]`).join('\n');
+  const box=document.getElementById('auditBox');box.innerHTML='<div class="cqline"><span class="spin"></span>Auditing the section…</div>';
+  const sys=`You are the section auditor in SELCO Foundation's Value Chain Research Console. Review the findings a team committed for "${S.title}". Standards: specific, district-level where relevant, traced to credible 2022+ sources, not resting on bare AI. Produce: (1) one-line VERDICT (field-ready / mixed / not field-ready); (2) the 1-2 weakest findings by number and why; (3) the single most important question for this section still UNANSWERED by these findings. Direct and brief, under 130 words. No praise.`;
+  const usr=`KEY QUESTIONS FOR THIS SECTION:\n- ${S.probes.join('\n- ')}\n\nFINDINGS (${t.t}: ${t.good} verified, ${t.mid} unchecked, ${t.bad} no/failed source):\n${dump}\n\nAudit this section.`;
+  try{ const out=await callClaude(sys,usr,false); box.innerHTML='<div class="cqline"><b style="color:var(--orange-soft)">Section audit</b>\n'+esc(out)+'</div>'; }
+  catch(e){ box.innerHTML='<div class="cqline">Audit needs the active runtime / server relay. '+esc(e.message)+'</div>'; }
+}
+
+/* ---------------- DASHBOARD / SHARE / SAVE ---------------- */
+async function renderDashboard(m){
+  let html=`<div class="eyebrow">Reviewer dashboard</div><h1 class="sectitle">All research projects</h1><div class="secsub">Your projects saved on this browser. Send any project to a reviewer as a link via Publish &amp; share.</div>`;
+  let projects=[];
+  if(Store.ok){const keys=await Store.list();for(const k of keys){const p=await Store.load(k.replace('vcproj:',''));if(p)projects.push(p);}}
+  if(P&&!projects.find(p=>p.id===P.id))projects.unshift(P);
+  if(!projects.length){m.innerHTML=html+'<div class="empty">No projects yet.</div>';return;}
+  html+='<div class="dashgrid">'+projects.map(p=>{let all=[];SECTIONS.forEach(s=>(p.f[s.id]||[]).forEach(x=>all.push(x)));const t=tally(all);const pG=t.t?t.good/t.t*100:0,pM=t.t?t.mid/t.t*100:0,pB=t.t?t.bad/t.t*100:0;const done=SECTIONS.filter(s=>(p.f[s.id]||[]).length).length;
+    return `<div class="dashcard" onclick="openSnap('${p.id}')"><h4>${esc(p.vc)}</h4><div class="meta">${esc(p.geo)} · ${esc(p.team)}</div><div class="minibar"><div style="width:${pG}%;background:var(--good)"></div><div style="width:${pM}%;background:var(--amber)"></div><div style="width:${pB}%;background:var(--red)"></div></div><div class="stat">${t.t} findings · <b style="color:var(--good)">${t.rigor}% verified</b> · <b style="color:var(--red)">${t.bad} debt</b> · ${done}/10 sections</div></div>`;}).join('')+'</div>';
+  m.innerHTML=html;
+}
+async function openSnap(id){let p=(P&&P.id===id)?P:await Store.load(id);if(!p)return;P=p;readonly=true;document.getElementById('saveBar').style.display='none';go('s1');}
+function renderShare(m){
+  let url='';try{url=location.origin+location.pathname+'#view='+btoa(unescape(encodeURIComponent(JSON.stringify(P))));}catch(e){}
+  const internal=location.protocol==='blob:'||!location.hostname||/claude|usercontent|anthropic/i.test(location.href);
+  m.innerHTML=topbar()+`<div class="eyebrow">Publish &amp; share</div><h1 class="sectitle">Share this research</h1><div class="secsub">Generates a link carrying the full project — findings, source-checks, field plan and scorecards. A reviewer opens it read-only.</div><div class="pastecard"><label style="font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600">Shareable link</label><input id="shareUrl" readonly value="${esc(url)}" onclick="this.select()" style="margin:6px 0 11px"><div class="btnrow"><button class="btn btn-ghost" id="copyBtn" onclick="copyShare()">⧉ Copy link</button>${Store.ok?'<button class="btn btn-primary" onclick="saveProject(true)">Save to dashboard</button>':''}</div><div class="hint" style="margin-top:10px">${internal?'Inside this preview the link works only in your session. Once hosted (e.g. Vercel), Publish produces a real public link.':'Anyone with this link sees this exact snapshot. Re-open Share after adding findings for an updated link.'}</div></div>`;
+}
+function copyShare(){const inp=document.getElementById('shareUrl'),b=document.getElementById('copyBtn'),done=()=>{b.textContent='✓ Copied';setTimeout(()=>b.textContent='⧉ Copy link',1600);};if(navigator.clipboard){navigator.clipboard.writeText(inp.value).then(done).catch(()=>{inp.select();try{document.execCommand('copy')}catch(e){}done();});}else{inp.select();try{document.execCommand('copy')}catch(e){}done();}}
+function markSaved(){const s=document.getElementById('saveStatus');if(s)s.innerHTML='<b>Saved</b> · '+new Date(P.updated).toLocaleTimeString();}
+async function saveProject(){if(!P||readonly)return;P.updated=Date.now();const s=document.getElementById('saveStatus');if(Store.ok){const ok=await Store.save(P.id,P);if(s)s.innerHTML=ok?('<b>Saved</b> · '+new Date(P.updated).toLocaleTimeString()):'Save unavailable — use Publish link';}else if(s){s.textContent='Session only — use Publish link to keep this';}}
+
+/* utility */
+function esc(s){return(''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function secNum(sid){const s=SECTIONS.find(x=>x.id===sid);return s?s.num:'';}
+function grpName(sid,k){const s=SECTIONS.find(x=>x.id===sid);const g=s&&s.groups.find(x=>x.k===k);return g?g.name:'';}
+</script>
+</body>
+</html>
