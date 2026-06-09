@@ -3,7 +3,7 @@ export default async function handler(req, res) {
   try {
     const { system, user, useWeb } = req.body;
     const body = {
-      model: "claude-sonnet-4-20250514",
+      model: "claude-3-5-sonnet-latest",
       max_tokens: 1200,
       system,
       messages: [{ role: "user", content: user }],
@@ -19,9 +19,12 @@ export default async function handler(req, res) {
       body: JSON.stringify(body),
     });
     const data = await r.json();
+    if (data.error) {
+      return res.status(200).json({ text: "VERIFY ERROR: " + (data.error.message || JSON.stringify(data.error)) });
+    }
     const text = (data.content || []).filter((i) => i.type === "text").map((i) => i.text).join("\n");
     return res.status(200).json({ text });
   } catch (e) {
-    return res.status(500).json({ error: e.message });
+    return res.status(200).json({ text: "RELAY ERROR: " + e.message });
   }
 }
